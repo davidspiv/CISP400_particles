@@ -1,20 +1,24 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 
 #include "Matrices.h"
 
-#define _USE_MATH_DEFINES  // for vs
+#include <SFML/Graphics.hpp>
 
-const float G = 1000;   // Gravity
-const float TTL = 5.0;  // Time To Live
+#define _USE_MATH_DEFINES // for vs
+
+const float G = 1000;  // Gravity
+const float TTL = 5.0; // Time To Live
 const float SCALE = 0.999;
+
+const sf::Color WHITE = sf::Color(255l, 255l, 255l);
 
 using namespace Matrices;
 using namespace sf;
+
 class Particle : public Drawable {
- public:
-  Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition);
-  virtual void draw(RenderTarget& target, RenderStates states) const override;
+public:
+  Particle(RenderTarget &target, int numPoints, Vector2i mouseClickPosition);
+  virtual void draw(RenderTarget &target, RenderStates states) const override;
   void update(float dt);
   float getTTL() { return m_ttl; }
 
@@ -22,7 +26,7 @@ class Particle : public Drawable {
   bool almostEqual(double a, double b, double eps = 0.0001);
   void unitTests();
 
- private:
+private:
   float m_ttl;
   int m_numPoints;
   Vector2f m_centerCoordinate;

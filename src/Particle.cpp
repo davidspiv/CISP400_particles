@@ -15,8 +15,8 @@ Particle::Particle(RenderTarget &target, int numPoints,
                    Vector2i mouseClickPosition)
     : m_ttl(TTL), m_numPoints(numPoints),
       m_radiansPerSec(getRandInt(0, 1) * M_PI), m_vx(getRandInt(100, 500)),
-      m_vy(getRandInt(100, 500)), m_color1(sf::Color(255l, 255l, 255l)),
-      m_color2(getRandColor()), m_A(2, numPoints) {
+      m_vy(getRandInt(100, 500)), m_color1(WHITE), m_color2(getRandColor()),
+      m_A(2, numPoints) {
 
   m_cartesianPlane.setCenter(0, 0);
   m_cartesianPlane.setSize(target.getSize().x, (-1.0) * target.getSize().y);
