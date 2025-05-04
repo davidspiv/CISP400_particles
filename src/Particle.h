@@ -35,7 +35,7 @@ class Particle : public Drawable {
   Matrix m_A;
 
   /// rotate Particle by theta radians counter-clockwise
-  /// construct a RotationMatrix R, left mulitply it to m_A
+  /// construct a RotationMatrix R, left multiply it to m_A
   void rotate(double theta);
 
   /// Scale the size of the Particle by factor c

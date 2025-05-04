@@ -1,4 +1,5 @@
 #include "Particle.h"
+#include "Matrices.h"
 
 int getRandInt(const int min, const int max) {
   return (std::rand() % (max - min + 1)) + min;
@@ -34,6 +35,35 @@ Particle::Particle(RenderTarget &target, int numPoints,
     m_A(1, i) = m_centerCoordinate.y + dy;
     theta += dTheta;
   }
+};
+
+
+void Particle::rotate(double theta) {
+  const Matrices::RotationMatrix rotateMatrix(theta);
+  const Vector2f tempCoord = m_centerCoordinate;
+
+  translate(-m_centerCoordinate.x, -m_centerCoordinate.y);
+  m_A = rotateMatrix * m_A;
+  translate(tempCoord.x, tempCoord.y);
+};
+
+
+void Particle::scale(double c) {
+  const Matrices::ScalingMatrix scaleMatrix(c);
+  const Vector2f tempCoord = m_centerCoordinate;
+
+  translate(-m_centerCoordinate.x, -m_centerCoordinate.y);
+  m_A = scaleMatrix * m_A;
+  translate(tempCoord.x, tempCoord.y);
+};
+
+
+void Particle::translate(double xShift, double yShift) {
+  const Matrices::TranslationMatrix transMatrix(xShift, yShift, m_numPoints);
+
+  m_A = transMatrix + m_A;
+  m_centerCoordinate.x += xShift;
+  m_centerCoordinate.y += yShift;
 };
 
 
