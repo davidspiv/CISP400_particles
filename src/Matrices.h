@@ -7,6 +7,8 @@
 #include <vector>
 using namespace std;
 
+namespace Matrices {
+
 class Matrix {
 public:
   /// Construct a matrix of the specified size.
@@ -21,8 +23,8 @@ public:
   /// usage:  a(i,j) = x;
   double &operator()(int i, int j) { return m_values.at(i).at(j); }
 
-  int rows() const { return m_rows; }
-  int cols() const { return m_cols; }
+  int getRows() const { return m_rows; }
+  int getCols() const { return m_cols; }
 
 protected:
   vector<vector<double>> m_values;
@@ -58,12 +60,6 @@ ostream &operator<<(ostream &os, const Matrix &a);
 /// usage:  A = R * A rotates A theta radians counter-clockwise
 class RotationMatrix : public Matrix {
 public:
-  /// Call the parent constructor to create a 2x2 matrix
-  /// Then assign each element as follows:
-  /*
-  cos(theta)  -sin(theta)
-  sin(theta)   cos(theta)
-  */
   /// theta represents the angle of rotation in radians, counter-clockwise
   RotationMatrix(double theta);
 };
@@ -72,12 +68,6 @@ public:
 /// usage:  A = S * A expands or contracts A by the specified scaling factor
 class ScalingMatrix : public Matrix {
 public:
-  /// Call the parent constructor to create a 2x2 matrix
-  /// Then assign each element as follows:
-  /*
-  scale   0
-  0       scale
-  */
   /// scale represents the size multiplier
   ScalingMatrix(double scale);
 };
@@ -86,16 +76,13 @@ public:
 /// usage:  A = T + A will shift all coordinates of A by (xShift, yShift)
 class TranslationMatrix : public Matrix {
 public:
-  /// Call the parent constructor to create a 2xn matrix
-  /// Then assign each element as follows:
-  /*
-  xShift  xShift  xShift  ...
-  yShift  yShift  yShift  ...
-  */
-  /// paramaters are xShift, yShift, and nCols
+  /// parameters are xShift, yShift, and nCols
   /// nCols represents the number of columns in the matrix
   /// where each column contains one (x,y) coordinate pair
   TranslationMatrix(double xShift, double yShift, int nCols);
 };
+
+
+} // namespace Matrices
 
 #endif
