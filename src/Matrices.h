@@ -51,7 +51,7 @@ bool operator!=(const Matrix &a, const Matrix &b);
 
 /// Output matrix.
 /// Separate columns by ' ' and rows by '\n'
-ostream &operator<<(ostream &os, const Matrix &a);
+std::ostream &operator<<(std::ostream &os, const Matrix &a);
 
 /*******************************************************************************/
 

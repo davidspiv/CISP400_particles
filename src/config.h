@@ -1,8 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
 
-constexpr char *WINDOW_TITLE = "Particle Project";
+const std::string WINDOW_TITLE = "Particle Project";
 constexpr uint8_t TARGET_FPS = 60;
 
 constexpr float G = 1000;  // Gravity

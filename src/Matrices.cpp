@@ -105,7 +105,7 @@ ScalingMatrix::ScalingMatrix(double scale) : Matrix(2, 2) {
 TranslationMatrix::TranslationMatrix(double xShift, double yShift, int nCols)
     : Matrix(2, nCols) {
 
-  for (size_t i = 0; i < nCols; i++) {
+  for (int i = 0; i < nCols; i++) {
     m_values[i][0] = xShift;
     m_values[i][1] = yShift;
   }

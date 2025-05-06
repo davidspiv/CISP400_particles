@@ -17,7 +17,7 @@ Particle::Particle(RenderTarget &target, int numPoints,
   double theta = getRandInt(0, 1) * M_PI / 2;
   const float dTheta = 2 * M_PI / (numPoints - 1);
 
-  for (size_t i = 0; i < numPoints; i++) {
+  for (int i = 0; i < numPoints; i++) {
     float r = getRandInt(20, 80);
     float dx = r * cos(theta);
     float dy = r * sin(theta);
@@ -26,6 +26,35 @@ Particle::Particle(RenderTarget &target, int numPoints,
     m_A(1, i) = m_centerCoordinate.y + dy;
     theta += dTheta;
   }
+};
+
+
+void Particle::draw(RenderTarget &target, RenderStates states) const {
+  sf::VertexArray lines(sf::TriangleFan, m_numPoints + 1);
+  sf::Vector2f center(m_centerCoordinate);
+
+  lines[0].position = center;
+  lines[0].color = m_color1;
+  for (int j = 1; j <= m_numPoints; j++) {
+    lines[j].position = sf::Vector2f(target.mapCoordsToPixel(
+        sf::Vector2f(m_A(j - 1, 0), m_A(j - 1, 0)), m_cartesianPlane));
+    lines[j].color = m_color2;
+  }
+
+  target.draw(lines, states);
+};
+
+
+void Particle::update(float dt) {
+  m_ttl -= dt;
+  m_vy -= G * dt;
+
+  const float dx = m_vx * dt;
+  const float dy = m_vy * dt;
+
+  rotate(dt * m_radiansPerSec);
+  scale(SCALE);
+  translate(dx, dy);
 };
 
 
