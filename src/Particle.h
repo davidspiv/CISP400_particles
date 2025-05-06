@@ -10,7 +10,7 @@ using namespace sf;
 class Particle : public Drawable {
 public:
     Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition);
-    void update(float dt);
+    void update(RenderTarget& target, float dt);
     virtual void draw(RenderTarget& target, RenderStates states) const override;
     float getTTL() { return m_ttl; }
 
@@ -29,6 +29,7 @@ private:
     Color m_color1;
     Color m_color2;
     Matrix m_A;
+    sf::VertexArray m_shape;
 
     /// rotate Particle by theta radians counter-clockwise
     /// construct a RotationMatrix R, left multiply it to m_A

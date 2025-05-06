@@ -49,7 +49,7 @@ void Engine::update(float dtAsSeconds)
 
     while (it != m_particles.end()) {
         if (it->getTTL() > 0.0) {
-            it->update(dtAsSeconds);
+            it->update(m_window, dtAsSeconds);
             ++it;
         } else {
             it = m_particles.erase(it);

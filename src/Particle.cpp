@@ -30,9 +30,15 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
         m_A(1, j) = m_centerCoordinate.y + dy;
         theta += dTheta;
     }
+
+    m_shape = sf::VertexArray(sf::TriangleFan, m_numPoints + 1);
+    m_shape[0].color = m_color1;
+    for (size_t i = 1; i < m_shape.getVertexCount(); i++) {
+        m_shape[i].color = m_color2;
+    }
 }
 
-void Particle::update(float dt)
+void Particle::update(RenderTarget& target, float dt)
 {
     m_ttl -= dt;
     m_vy -= G * dt;
@@ -43,25 +49,18 @@ void Particle::update(float dt)
     rotate(dt * m_radiansPerSec);
     scale(SCALE);
     translate(dx, dy);
-}
 
-void Particle::draw(RenderTarget& target, RenderStates states) const
-{
-    sf::VertexArray lines(sf::TriangleFan, m_numPoints + 1);
-    sf::Vector2f center(m_centerCoordinate);
-
-    lines[0].position = sf::Vector2f(target.mapCoordsToPixel(center, m_cartesianPlane));
-    lines[0].color = m_color1;
+    m_shape[0].position
+        = sf::Vector2f(target.mapCoordsToPixel(m_centerCoordinate, m_cartesianPlane));
 
     for (int j = 1; j <= m_numPoints; j++) {
         sf::Vector2f worldPos(m_A(0, j - 1), m_A(1, j - 1));
-        sf::Vector2i pixelPos = target.mapCoordsToPixel(worldPos, m_cartesianPlane);
-        lines[j].position = static_cast<sf::Vector2f>(pixelPos);
-        lines[j].color = m_color2;
+        sf::Vector2i screenPos = target.mapCoordsToPixel(worldPos, m_cartesianPlane);
+        m_shape[j].position = static_cast<sf::Vector2f>(screenPos);
     }
-
-    target.draw(lines);
 }
+
+void Particle::draw(RenderTarget& target, RenderStates states) const { target.draw(m_shape); }
 
 void Particle::rotate(double theta)
 {
