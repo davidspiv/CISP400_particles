@@ -22,9 +22,6 @@ inline void setup_window(sf::RenderWindow &window, const int width,
     throw std::runtime_error("Failed to create SFML window");
   }
 
-  std::cout << "Anti-Aliasing: "
-            << (window.getSettings().antialiasingLevel ? "ON" : "OFF") << "\n";
-
   auto desktop = sf::VideoMode::getDesktopMode();
   window.setPosition({static_cast<int>(desktop.width / 2 - width / 2),
                       static_cast<int>(desktop.height / 2 - height / 2)});

@@ -42,7 +42,13 @@ void Engine::update(float dtAsSeconds) {
 }
 
 
-void Engine::draw() {}
+void Engine::draw() {
+  m_Window.clear();
+  for (auto particle : m_particles) {
+    m_Window.draw(particle);
+  }
+  m_Window.display();
+}
 
 
 void Engine::run() {
