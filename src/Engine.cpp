@@ -1,6 +1,5 @@
 #include "Engine.h"
 #include "Particle.h"
-#include "Timer.h"
 #include "util.h"
 
 Engine::Engine()
@@ -20,8 +19,12 @@ Engine::Engine()
 
 void Engine::input()
 {
-    Timer timer("Engine::input");
     Event event;
+
+    if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+        m_window.close();
+    }
+
     while (m_window.pollEvent(event)) {
         if (event.type == Event::Closed) {
             m_window.close();
@@ -29,22 +32,20 @@ void Engine::input()
 
         if (event.type == sf::Event::MouseButtonPressed
             && event.mouseButton.button == sf::Mouse::Left) {
-            sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
-
-            for (size_t i = 0; i < 5; i++) {
-                m_particles.emplace_back(Particle(m_window, getRandInt(25, 50), mousePos));
-            }
+            // only triggers once per click
         }
     }
 
-    if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-        m_window.close();
+    sf::Vector2i const mousePos = sf::Mouse::getPosition(m_window);
+    bool const mouseLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+
+    if (mouseLeftPressed) {
+        m_particles.emplace_back(Particle(m_window, getRandOddInt(10, 33), mousePos));
     }
 }
 
 void Engine::update(float dtAsSeconds)
 {
-    Timer timer("Engine::update");
     vector<Particle>::iterator it = m_particles.begin();
 
     while (it != m_particles.end()) {
@@ -59,7 +60,6 @@ void Engine::update(float dtAsSeconds)
 
 void Engine::draw()
 {
-    Timer timer("Engine::draw");
     m_window.clear();
     for (auto particle : m_particles) {
         m_window.draw(particle);

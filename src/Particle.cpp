@@ -22,7 +22,7 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
     double theta = getRandDouble(0, 1) * M_PI / 2;
 
     for (int j = 0; j < numPoints; j++) {
-        double r = getRandInt(20, 80);
+        double r = (j % 2) ? 20.f : 40.f;
         double dx = r * std::cos(theta);
         double dy = r * std::sin(theta);
 
@@ -31,6 +31,7 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
         theta += dTheta;
     }
 
+    // Initialize vertexArray ONCE per lifetime
     m_shape = sf::VertexArray(sf::TriangleFan, m_numPoints + 1);
     m_shape[0].color = m_color1;
     for (size_t i = 1; i < m_shape.getVertexCount(); i++) {
