@@ -2,32 +2,42 @@
 #include "Particle.h"
 #include "util.h"
 
-Engine::Engine() { setup_window(m_Window, 1920, 1080); }
+Engine::Engine()
+{
+    m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
+
+    if (!m_window.isOpen()) {
+        throw std::runtime_error("Failed to create SFML window");
+    }
+
+    auto desktop = sf::VideoMode::getDesktopMode();
+    m_window.setPosition({ static_cast<int>(desktop.width / 2 - WINDOW_WIDTH / 2),
+        static_cast<int>(desktop.height / 2 - WINDOW_HEIGHT / 2) });
+
+    m_window.setFramerateLimit(TARGET_FPS);
+}
 
 void Engine::input()
 {
 
     Event event;
-    while (m_Window.pollEvent(event)) {
+    while (m_window.pollEvent(event)) {
         if (event.type == Event::Closed) {
-            m_Window.close();
+            m_window.close();
         }
 
-        if (event.type == sf::Event::MouseButtonPressed) {
-            if (event.mouseButton.button == sf::Mouse::Left) {
+        if (event.type == sf::Event::MouseButtonPressed
+            && event.mouseButton.button == sf::Mouse::Left) {
+            sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
 
-                sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
-
-                for (size_t i = 0; i < 5; i++) {
-                    m_particles.emplace_back(
-                        Particle(m_Window, getRandInt(25, 50), mousePos));
-                }
+            for (size_t i = 0; i < 5; i++) {
+                m_particles.emplace_back(Particle(m_window, getRandInt(25, 50), mousePos));
             }
         }
     }
 
     if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-        m_Window.close();
+        m_window.close();
     }
 }
 
@@ -47,11 +57,11 @@ void Engine::update(float dtAsSeconds)
 
 void Engine::draw()
 {
-    m_Window.clear();
+    m_window.clear();
     for (auto particle : m_particles) {
-        m_Window.draw(particle);
+        m_window.draw(particle);
     }
-    m_Window.display();
+    m_window.display();
 }
 
 void Engine::run()
@@ -60,13 +70,12 @@ void Engine::run()
 
     // TESTS
     cout << "Starting Particle unit tests..." << endl;
-    Particle p(m_Window, 4,
-        { (int)m_Window.getSize().x / 2, (int)m_Window.getSize().y / 2 });
+    Particle p(m_window, 4, { (int)m_window.getSize().x / 2, (int)m_window.getSize().y / 2 });
     p.unitTests();
     cout << "Unit tests complete.  Starting engine..." << endl;
 
     // ENGINE
-    while (m_Window.isOpen()) {
+    while (m_window.isOpen()) {
         float const dtAsSeconds = frameClock.restart().asSeconds();
 
         input();

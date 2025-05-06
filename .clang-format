@@ -15,6 +15,7 @@ InsertNewlineAtEOF: true
 LineEnding: LF
 NamespaceIndentation: None
 QualifierAlignment: Right
+ColumnLimit: 100
 RemoveSemicolon: true
 RequiresClausePosition: WithFollowing
 RequiresExpressionIndentation: OuterScope

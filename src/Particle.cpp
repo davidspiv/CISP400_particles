@@ -1,15 +1,15 @@
 #include "Particle.h"
 #include "Matrices.h"
+#include "Timer.h"
 #include "util.h"
 
-Particle::Particle(RenderTarget& target, int numPoints,
-    Vector2i mouseClickPosition)
+Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition)
     : m_ttl(TTL)
     , m_numPoints(numPoints)
     , m_radiansPerSec(getRandInt(0, 1) * M_PI)
-    , m_vx(rand() % 2 ? getRandInt(100, 500) : getRandInt(100, 500) * -1)
+    , m_vx(getRandInt(-500, 500))
     , m_vy(getRandInt(100, 500))
-    , m_color1(WHITE)
+    , m_color1(sf::Color(255l, 255l, 255l))
     , m_color2(getRandColor())
     , m_A(2, numPoints)
 {
@@ -18,8 +18,8 @@ Particle::Particle(RenderTarget& target, int numPoints,
     m_cartesianPlane.setSize(target.getSize().x, (-1.0) * target.getSize().y);
     m_centerCoordinate = target.mapPixelToCoords(mouseClickPosition, m_cartesianPlane);
 
-    double theta = getRandDouble(0, 1) * M_PI / 2;
     double const dTheta = 2 * M_PI / (numPoints - 1);
+    double theta = getRandDouble(0, 1) * M_PI / 2;
 
     for (int j = 0; j < numPoints; j++) {
         double r = getRandInt(20, 80);
@@ -34,6 +34,7 @@ Particle::Particle(RenderTarget& target, int numPoints,
 
 void Particle::draw(RenderTarget& target, RenderStates states) const
 {
+    Timer timer("Particle::draw");
     sf::VertexArray lines(sf::TriangleFan, m_numPoints + 1);
     sf::Vector2f center(m_centerCoordinate);
 
@@ -52,6 +53,7 @@ void Particle::draw(RenderTarget& target, RenderStates states) const
 
 void Particle::update(float dt)
 {
+    Timer timer("Particle::update");
     m_ttl -= dt;
     m_vy -= G * dt;
 
@@ -92,10 +94,7 @@ void Particle::translate(double xShift, double yShift)
     m_centerCoordinate.y += yShift;
 }
 
-bool Particle::almostEqual(double a, double b, double eps)
-{
-    return fabs(a - b) < eps;
-}
+bool Particle::almostEqual(double a, double b, double eps) { return fabs(a - b) < eps; }
 
 void Particle::unitTests()
 {
@@ -104,7 +103,9 @@ void Particle::unitTests()
     std::cout << "Testing RotationMatrix constructor...";
     double theta = M_PI / 4.0;
     RotationMatrix r(M_PI / 4);
-    if (r.getRows() == 2 && r.getCols() == 2 && almostEqual(r(0, 0), cos(theta)) && almostEqual(r(0, 1), -sin(theta)) && almostEqual(r(1, 0), sin(theta)) && almostEqual(r(1, 1), cos(theta))) {
+    if (r.rows() == 2 && r.cols() == 2 && almostEqual(r(0, 0), cos(theta))
+        && almostEqual(r(0, 1), -sin(theta)) && almostEqual(r(1, 0), sin(theta))
+        && almostEqual(r(1, 1), cos(theta))) {
         std::cout << "Passed.  +1" << std::endl;
         score++;
     } else {
@@ -113,7 +114,8 @@ void Particle::unitTests()
 
     std::cout << "Testing ScalingMatrix constructor..." << std::flush;
     ScalingMatrix s(1.5);
-    if (s.getRows() == 2 && s.getCols() == 2 && almostEqual(s(0, 0), 1.5) && almostEqual(s(0, 1), 0) && almostEqual(s(1, 0), 0) && almostEqual(s(1, 1), 1.5)) {
+    if (s.rows() == 2 && s.cols() == 2 && almostEqual(s(0, 0), 1.5) && almostEqual(s(0, 1), 0)
+        && almostEqual(s(1, 0), 0) && almostEqual(s(1, 1), 1.5)) {
         std::cout << "Passed.  +1" << std::endl;
         score++;
     } else {
@@ -122,7 +124,9 @@ void Particle::unitTests()
 
     std::cout << "Testing TranslationMatrix constructor..." << std::flush;
     TranslationMatrix t(5, -5, 3);
-    if (t.getRows() == 2 && t.getCols() == 3 && almostEqual(t(0, 0), 5) && almostEqual(t(1, 0), -5) && almostEqual(t(0, 1), 5) && almostEqual(t(1, 1), -5) && almostEqual(t(0, 2), 5) && almostEqual(t(1, 2), -5)) {
+    if (t.rows() == 2 && t.cols() == 3 && almostEqual(t(0, 0), 5) && almostEqual(t(1, 0), -5)
+        && almostEqual(t(0, 1), 5) && almostEqual(t(1, 1), -5) && almostEqual(t(0, 2), 5)
+        && almostEqual(t(1, 2), -5)) {
         std::cout << "Passed.  +1" << std::endl;
         score++;
     } else {
@@ -132,24 +136,23 @@ void Particle::unitTests()
     std::cout << "Testing Particles..." << std::endl;
     std::cout << "Testing Particle mapping to Cartesian origin..." << std::endl;
     if (m_centerCoordinate.x != 0 || m_centerCoordinate.y != 0) {
-        std::cout << "Failed.  Expected (0,0).  Received: (" << m_centerCoordinate.x
-                  << "," << m_centerCoordinate.y << ")" << std::endl;
+        std::cout << "Failed.  Expected (0,0).  Received: (" << m_centerCoordinate.x << ","
+                  << m_centerCoordinate.y << ")" << std::endl;
     } else {
         std::cout << "Passed.  +1" << std::endl;
         score++;
     }
 
-    std::cout << "Applying one rotation of 90 degrees about the origin..."
-              << std::endl;
+    std::cout << "Applying one rotation of 90 degrees about the origin..." << std::endl;
     Matrix initialCoords = m_A;
     rotate(M_PI / 2.0);
     bool rotationPassed = true;
-    for (int j = 0; j < initialCoords.getCols(); j++) {
-        if (!almostEqual(m_A(0, j), -initialCoords(1, j)) || !almostEqual(m_A(1, j), initialCoords(0, j))) {
+    for (int j = 0; j < initialCoords.cols(); j++) {
+        if (!almostEqual(m_A(0, j), -initialCoords(1, j))
+            || !almostEqual(m_A(1, j), initialCoords(0, j))) {
             std::cout << "Failed mapping: ";
-            std::cout << "(" << initialCoords(0, j) << ", " << initialCoords(1, j)
-                      << ") ==> (" << m_A(0, j) << ", " << m_A(1, j) << ")"
-                      << std::endl;
+            std::cout << "(" << initialCoords(0, j) << ", " << initialCoords(1, j) << ") ==> ("
+                      << m_A(0, j) << ", " << m_A(1, j) << ")" << std::endl;
             rotationPassed = false;
         }
     }
@@ -164,12 +167,12 @@ void Particle::unitTests()
     initialCoords = m_A;
     scale(0.5);
     bool scalePassed = true;
-    for (int j = 0; j < initialCoords.getCols(); j++) {
-        if (!almostEqual(m_A(0, j), 0.5 * initialCoords(0, j)) || !almostEqual(m_A(1, j), 0.5 * initialCoords(1, j))) {
+    for (int j = 0; j < initialCoords.cols(); j++) {
+        if (!almostEqual(m_A(0, j), 0.5 * initialCoords(0, j))
+            || !almostEqual(m_A(1, j), 0.5 * initialCoords(1, j))) {
             std::cout << "Failed mapping: ";
-            std::cout << "(" << initialCoords(0, j) << ", " << initialCoords(1, j)
-                      << ") ==> (" << m_A(0, j) << ", " << m_A(1, j) << ")"
-                      << std::endl;
+            std::cout << "(" << initialCoords(0, j) << ", " << initialCoords(1, j) << ") ==> ("
+                      << m_A(0, j) << ", " << m_A(1, j) << ")" << std::endl;
             scalePassed = false;
         }
     }
@@ -184,12 +187,12 @@ void Particle::unitTests()
     initialCoords = m_A;
     translate(10, 5);
     bool translatePassed = true;
-    for (int j = 0; j < initialCoords.getCols(); j++) {
-        if (!almostEqual(m_A(0, j), 10 + initialCoords(0, j)) || !almostEqual(m_A(1, j), 5 + initialCoords(1, j))) {
+    for (int j = 0; j < initialCoords.cols(); j++) {
+        if (!almostEqual(m_A(0, j), 10 + initialCoords(0, j))
+            || !almostEqual(m_A(1, j), 5 + initialCoords(1, j))) {
             std::cout << "Failed mapping: ";
-            std::cout << "(" << initialCoords(0, j) << ", " << initialCoords(1, j)
-                      << ") ==> (" << m_A(0, j) << ", " << m_A(1, j) << ")"
-                      << std::endl;
+            std::cout << "(" << initialCoords(0, j) << ", " << initialCoords(1, j) << ") ==> ("
+                      << m_A(0, j) << ", " << m_A(1, j) << ")" << std::endl;
             translatePassed = false;
         }
     }

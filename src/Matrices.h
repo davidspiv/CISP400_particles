@@ -22,8 +22,8 @@ public:
     /// usage:  a(i,j) = x;
     double& operator()(int i, int j) { return m_values.at(i).at(j); }
 
-    int getRows() const { return m_rows; }
-    int getCols() const { return m_cols; }
+    int rows() const { return m_rows; }
+    int cols() const { return m_cols; }
 
 protected:
     std::vector<std::vector<double>> m_values;
