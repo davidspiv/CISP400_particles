@@ -1,28 +1,27 @@
 #pragma once
 #pragma once
-#include <SFML/Graphics.hpp>
 #include "Particle.h"
+#include <SFML/Graphics.hpp>
 using namespace sf;
 using namespace std;
 
-class Engine
-{
+class Engine {
 private:
-	// A regular RenderWindow
-	RenderWindow m_Window;
+    // A regular RenderWindow
+    RenderWindow m_Window;
 
-	//vector for Particles
-	vector<Particle> m_particles;
+    // vector for Particles
+    vector<Particle> m_particles;
 
-	// Private functions for internal use only
-	void input();
-	void update(float dtAsSeconds);
-	void draw();
+    // Private functions for internal use only
+    void input();
+    void update(float dtAsSeconds);
+    void draw();
 
 public:
-	// The Engine constructor
-	Engine();
+    // The Engine constructor
+    Engine();
 
-	// Run will call all the private functions
-	void run();
+    // Run will call all the private functions
+    void run();
 };
