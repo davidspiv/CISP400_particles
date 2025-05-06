@@ -107,7 +107,7 @@ void Particle::unitTests() {
     std::cout << "Failed." << std::endl;
   }
 
-  std::cout << "Testing ScalingMatrix constructor...";
+  std::cout << "Testing ScalingMatrix constructor..."<< std::flush;
   ScalingMatrix s(1.5);
   if (s.getRows() == 2 && s.getCols() == 2 && almostEqual(s(0, 0), 1.5) &&
       almostEqual(s(0, 1), 0) && almostEqual(s(1, 0), 0) &&
@@ -118,7 +118,7 @@ void Particle::unitTests() {
     std::cout << "Failed." << std::endl;
   }
 
-  std::cout << "Testing TranslationMatrix constructor...";
+  std::cout << "Testing TranslationMatrix constructor..." << std::flush;
   TranslationMatrix t(5, -5, 3);
   if (t.getRows() == 2 && t.getCols() == 3 && almostEqual(t(0, 0), 5) &&
       almostEqual(t(1, 0), -5) && almostEqual(t(0, 1), 5) &&
