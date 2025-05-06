@@ -5,7 +5,8 @@
 Particle::Particle(RenderTarget &target, int numPoints,
                    Vector2i mouseClickPosition)
     : m_ttl(TTL), m_numPoints(numPoints),
-      m_radiansPerSec(getRandInt(0, 1) * M_PI), m_vx(getRandInt(100, 500)),
+      m_radiansPerSec(getRandInt(0, 1) * M_PI),
+      m_vx(rand() % 2 ? getRandInt(100, 500) : getRandInt(100, 500) * -1),
       m_vy(getRandInt(100, 500)), m_color1(WHITE), m_color2(getRandColor()),
       m_A(2, numPoints) {
 
@@ -14,16 +15,16 @@ Particle::Particle(RenderTarget &target, int numPoints,
   m_centerCoordinate =
       target.mapPixelToCoords(mouseClickPosition, m_cartesianPlane);
 
-  double theta = getRandInt(0, 1) * M_PI / 2;
-  const float dTheta = 2 * M_PI / (numPoints - 1);
+  double theta = getRandDouble(0, 1) * M_PI / 2;
+  const double dTheta = 2 * M_PI / (numPoints - 1);
 
-  for (int i = 0; i < numPoints; i++) {
-    float r = getRandInt(20, 80);
-    float dx = r * cos(theta);
-    float dy = r * sin(theta);
+  for (int j = 0; j < numPoints; j++) {
+    double r = getRandInt(20, 80);
+    double dx = r * std::cos(theta);
+    double dy = r * std::sin(theta);
 
-    m_A(0, i) = m_centerCoordinate.x + dx;
-    m_A(1, i) = m_centerCoordinate.y + dy;
+    m_A(0, j) = m_centerCoordinate.x + dx;
+    m_A(1, j) = m_centerCoordinate.y + dy;
     theta += dTheta;
   }
 };
@@ -33,7 +34,8 @@ void Particle::draw(RenderTarget &target, RenderStates states) const {
   sf::VertexArray lines(sf::TriangleFan, m_numPoints + 1);
   sf::Vector2f center(m_centerCoordinate);
 
-  lines[0].position = center;
+  lines[0].position =
+      sf::Vector2f(target.mapCoordsToPixel(center, m_cartesianPlane));
   lines[0].color = m_color1;
   for (int j = 1; j <= m_numPoints; j++) {
     lines[j].position = sf::Vector2f(target.mapCoordsToPixel(
@@ -41,7 +43,7 @@ void Particle::draw(RenderTarget &target, RenderStates states) const {
     lines[j].color = m_color2;
   }
 
-  target.draw(lines, states);
+  target.draw(lines);
 };
 
 

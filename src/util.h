@@ -7,6 +7,11 @@ inline int getRandInt(const int min, const int max) {
   return (std::rand() % (max - min + 1)) + min;
 }
 
+inline double getRandDouble(double fMin, double fMax) {
+  double f = (double)rand() / RAND_MAX;
+  return fMin + f * (fMax - fMin);
+}
+
 
 inline sf::Color getRandColor() {
   return sf::Color(getRandInt(0, 255), getRandInt(0, 255), getRandInt(0, 255));
