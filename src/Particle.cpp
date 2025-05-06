@@ -203,4 +203,3 @@ void Particle::unitTests()
     }
 
     std::cout << "Score: " << score << " / 7" << std::endl;
-}

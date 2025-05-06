@@ -45,7 +45,7 @@ void Engine::input()
 
     if (mouseLeftPressed) {
         m_particles.emplace_back(Particle(m_window, m_colors[m_currColorIdx], mousePos));
-        m_currColorIdx = (m_currColorIdx < m_colors.size() - 1) ? m_currColorIdx + 1 : 0;
+        m_currColorIdx = (m_currColorIdx + 1) % m_colors.size(); // wraps
     }
 }
 
