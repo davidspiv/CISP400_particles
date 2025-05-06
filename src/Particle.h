@@ -1,16 +1,8 @@
 #pragma once
-
 #include "Matrices.h"
-
 #include <SFML/Graphics.hpp>
 
 #define _USE_MATH_DEFINES // for vs
-
-const float G = 1000;  // Gravity
-const float TTL = 5.0; // Time To Live
-const float SCALE = 0.999;
-
-const sf::Color WHITE = sf::Color(255l, 255l, 255l);
 
 using namespace Matrices;
 using namespace sf;

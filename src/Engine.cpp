@@ -1,4 +1,7 @@
 #include "Engine.h"
+#include "util.h"
+
+Engine::Engine() { setup_window(m_Window, 1920, 1080); }
 
 void Engine::input() {
   while (m_Window.isOpen()) {

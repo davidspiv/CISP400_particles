@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-using namespace std;
 
 namespace Matrices {
 
@@ -27,7 +26,7 @@ public:
   int getCols() const { return m_cols; }
 
 protected:
-  vector<vector<double>> m_values;
+  std::vector<std::vector<double>> m_values;
 
 private:
   int m_rows;
