@@ -1,4 +1,5 @@
 #pragma once
+#include "../lib/Color_Space.h"
 #include "config.h"
 #include <SFML/Graphics.hpp>
 #include <random>
@@ -25,6 +26,54 @@ inline double getRandDouble(double min, double max)
 inline sf::Color getRandColor()
 {
     return sf::Color(getRandInt(0, 255), getRandInt(0, 255), getRandInt(0, 255));
+}
+
+/**
+ * @brief Generates a smooth rainbow of colors starting from a specified color.
+ *
+ * @param sample_count The number of colors to generate. Must be at least 2.
+ * @param start_color The color where the rainbow starts. Defaults to red.
+ * @param rainbow_percent The portion of the color wheel to cover, as a
+ * percentage (100 = full rainbow, 50 = half rainbow, etc.). Defaults to 100.
+ *
+ * @return std::vector<sf::Color> A list of colors smoothly transitioning across
+ * the specified portion of the rainbow.
+ */
+inline std::vector<sf::Color> get_rainbow_colors(
+    int sample_count, sf::Color start_color = sf::Color::Red, float rainbow_percent = 100.f)
+{
+    if (sample_count < 2) {
+        throw std::domain_error("sample count must be >= 2 for correct interpolation.");
+    }
+
+    float const LIGHTNESS = 70.f;
+    float const CHROMA = 60.f;
+    float const sample_degrees = (360.0f * rainbow_percent) / 100.0f;
+
+    auto [l, c, start_hue] = clrspc::Rgb(start_color.r, start_color.g, start_color.b)
+                                 .to_lab()
+                                 .to_lch_ab()
+                                 .get_values();
+
+    start_hue -= 20.f; // offset to match perceived color
+
+    std::vector<sf::Color> colors;
+    colors.reserve(sample_count);
+
+    for (int i = 0; i < sample_count; ++i) {
+
+        float const hue
+            = clrspc::normalize_degrees(start_hue + (sample_degrees * i) / (sample_count - 1));
+
+        clrspc::Lch_Ab const lch_ab(LIGHTNESS, CHROMA, hue);
+
+        auto const [r, g, b] = lch_ab.to_lab().to_rgb().get_values();
+
+        colors.push_back(
+            sf::Color(static_cast<uint8_t>(r), static_cast<uint8_t>(g), static_cast<uint8_t>(b)));
+    }
+
+    return colors;
 }
 
 std::vector<sf::Color> const RAINBOW_GRADIENT = {

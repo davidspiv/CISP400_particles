@@ -1,6 +1,5 @@
 #include "Particle.h"
 #include "Matrices.h"
-#include "Timer.h"
 #include "util.h"
 
 Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition)
@@ -203,3 +202,4 @@ void Particle::unitTests()
     }
 
     std::cout << "Score: " << score << " / 7" << std::endl;
+}

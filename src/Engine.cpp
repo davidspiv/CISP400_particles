@@ -1,10 +1,13 @@
 #include "Engine.h"
 #include "Particle.h"
 #include "util.h"
+
 #include <SFML/Graphics.hpp>
 
 Engine::Engine()
     : m_currColorIdx(0)
+    , m_colors(RAINBOW_GRADIENT)
+// , m_colors(get_rainbow_colors(128))
 {
     m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 
@@ -17,8 +20,6 @@ Engine::Engine()
         static_cast<int>(desktop.height / 2 - WINDOW_HEIGHT / 2) });
 
     m_window.setFramerateLimit(TARGET_FPS);
-
-    m_colors = RAINBOW_GRADIENT;
 }
 
 void Engine::input()
