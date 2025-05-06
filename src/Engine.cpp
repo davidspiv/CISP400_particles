@@ -28,23 +28,34 @@ void Engine::input() {
 }
 
 
-void update(float dtAsSeconds) {};
+void Engine::update(float dtAsSeconds) {
+  vector<Particle>::iterator it = m_particles.begin();
+
+  while (it != m_particles.end()) {
+    if (it->getTTL() > 0.0) {
+      it->update(dtAsSeconds);
+      ++it;
+    } else {
+      it = m_particles.erase(it);
+    }
+  }
+}
 
 
-void draw() {};
+void Engine::draw() {}
 
 
 void Engine::run() {
   sf::Clock frameClock;
 
-  // INIT TESTS
+  // TESTS
   cout << "Starting Particle unit tests..." << endl;
   Particle p(m_Window, 4,
              {(int)m_Window.getSize().x / 2, (int)m_Window.getSize().y / 2});
   p.unitTests();
   cout << "Unit tests complete.  Starting engine..." << endl;
 
-  // RUN ENGINE
+  // ENGINE
   while (m_Window.isOpen()) {
     const float dtAsSeconds = frameClock.restart().asSeconds();
 
