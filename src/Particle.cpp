@@ -32,9 +32,21 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
     }
 }
 
+void Particle::update(float dt)
+{
+    m_ttl -= dt;
+    m_vy -= G * dt;
+
+    float const dx = m_vx * dt;
+    float const dy = m_vy * dt;
+
+    rotate(dt * m_radiansPerSec);
+    scale(SCALE);
+    translate(dx, dy);
+}
+
 void Particle::draw(RenderTarget& target, RenderStates states) const
 {
-    Timer timer("Particle::draw");
     sf::VertexArray lines(sf::TriangleFan, m_numPoints + 1);
     sf::Vector2f center(m_centerCoordinate);
 
@@ -49,20 +61,6 @@ void Particle::draw(RenderTarget& target, RenderStates states) const
     }
 
     target.draw(lines);
-}
-
-void Particle::update(float dt)
-{
-    Timer timer("Particle::update");
-    m_ttl -= dt;
-    m_vy -= G * dt;
-
-    float const dx = m_vx * dt;
-    float const dy = m_vy * dt;
-
-    rotate(dt * m_radiansPerSec);
-    scale(SCALE);
-    translate(dx, dy);
 }
 
 void Particle::rotate(double theta)

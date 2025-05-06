@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Particle.h"
+#include "Timer.h"
 #include "util.h"
 
 Engine::Engine()
@@ -19,7 +20,7 @@ Engine::Engine()
 
 void Engine::input()
 {
-
+    Timer timer("Engine::input");
     Event event;
     while (m_window.pollEvent(event)) {
         if (event.type == Event::Closed) {
@@ -43,6 +44,7 @@ void Engine::input()
 
 void Engine::update(float dtAsSeconds)
 {
+    Timer timer("Engine::update");
     vector<Particle>::iterator it = m_particles.begin();
 
     while (it != m_particles.end()) {
@@ -57,6 +59,7 @@ void Engine::update(float dtAsSeconds)
 
 void Engine::draw()
 {
+    Timer timer("Engine::draw");
     m_window.clear();
     for (auto particle : m_particles) {
         m_window.draw(particle);
