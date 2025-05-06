@@ -18,8 +18,7 @@ Engine::Engine()
 
     m_window.setFramerateLimit(TARGET_FPS);
 
-    m_colors = { sf::Color(0, 255, 255), sf::Color(0, 200, 255), sf::Color(0, 100, 255),
-        sf::Color(0, 50, 255), sf::Color(0, 0, 255) };
+    m_colors = RAINBOW_GRADIENT;
 }
 
 void Engine::input()
@@ -46,13 +45,13 @@ void Engine::input()
 
     if (mouseLeftPressed) {
         m_particles.emplace_back(Particle(m_window, m_colors[m_currColorIdx], mousePos));
+        m_currColorIdx = (m_currColorIdx < m_colors.size() - 1) ? m_currColorIdx + 1 : 0;
     }
 }
 
 void Engine::update(float dtAsSeconds)
 {
     std::vector<Particle>::iterator it = m_particles.begin();
-    m_currColorIdx = (m_currColorIdx < m_colors.size() - 1) ? m_currColorIdx + 1 : 0;
 
     while (it != m_particles.end()) {
         if (it->getTTL() > 0.0) {
