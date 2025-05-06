@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "Particle.h"
 #include "util.h"
 
 
@@ -15,9 +16,13 @@ void Engine::input() {
 
     if (event.type == sf::Event::MouseButtonPressed) {
       if (event.mouseButton.button == sf::Mouse::Left) {
-        // make particle at
-        event.mouseButton.x;
-        event.mouseButton.y;
+
+        sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
+
+        for (size_t i = 0; i < 5; i++) {
+          m_particles.emplace_back(
+              Particle(m_Window, getRandInt(25, 50), mousePos));
+        }
       }
     }
   }
