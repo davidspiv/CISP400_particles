@@ -1,8 +1,10 @@
 #include "Engine.h"
 #include "Particle.h"
 #include "util.h"
+#include <SFML/Graphics.hpp>
 
 Engine::Engine()
+    : m_currColorIdx(0)
 {
     m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 
@@ -15,6 +17,9 @@ Engine::Engine()
         static_cast<int>(desktop.height / 2 - WINDOW_HEIGHT / 2) });
 
     m_window.setFramerateLimit(TARGET_FPS);
+
+    m_colors = { sf::Color(0, 255, 255), sf::Color(0, 200, 255), sf::Color(0, 100, 255),
+        sf::Color(0, 50, 255), sf::Color(0, 0, 255) };
 }
 
 void Engine::input()
@@ -40,13 +45,14 @@ void Engine::input()
     bool const mouseLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 
     if (mouseLeftPressed) {
-        m_particles.emplace_back(Particle(m_window, getRandOddInt(10, 33), mousePos));
+        m_particles.emplace_back(Particle(m_window, m_colors[m_currColorIdx], mousePos));
     }
 }
 
 void Engine::update(float dtAsSeconds)
 {
-    vector<Particle>::iterator it = m_particles.begin();
+    std::vector<Particle>::iterator it = m_particles.begin();
+    m_currColorIdx = (m_currColorIdx < m_colors.size() - 1) ? m_currColorIdx + 1 : 0;
 
     while (it != m_particles.end()) {
         if (it->getTTL() > 0.0) {
@@ -72,10 +78,11 @@ void Engine::run()
     sf::Clock frameClock;
 
     // TESTS
-    cout << "Starting Particle unit tests..." << endl;
-    Particle p(m_window, 4, { (int)m_window.getSize().x / 2, (int)m_window.getSize().y / 2 });
+    std::cout << "Starting Particle unit tests..." << std::endl;
+    Particle p(m_window, sf::Color(0, 255, 255),
+        { (int)m_window.getSize().x / 2, (int)m_window.getSize().y / 2 });
     p.unitTests();
-    cout << "Unit tests complete.  Starting engine..." << endl;
+    std::cout << "Unit tests complete.  Starting engine..." << std::endl;
 
     // ENGINE
     while (m_window.isOpen()) {

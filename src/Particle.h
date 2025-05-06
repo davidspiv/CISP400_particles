@@ -14,7 +14,7 @@ private:
     static float constexpr SCALE = 0.99;
 
 public:
-    Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition);
+    Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition);
     void update(RenderTarget& target, float dt);
     virtual void draw(RenderTarget& target, RenderStates states) const override;
     float getTTL() { return m_ttl; }

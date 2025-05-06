@@ -3,25 +3,25 @@
 #include "Timer.h"
 #include "util.h"
 
-Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition)
+Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition)
     : m_ttl(TTL)
-    , m_numPoints(numPoints)
+    , m_numPoints(getRandOddInt(10, 33))
     , m_radiansPerSec(getRandInt(0, 1) * M_PI)
     , m_vx(getRandInt(-500, 500))
     , m_vy(getRandInt(100, 500))
     , m_color1(sf::Color(255l, 255l, 255l))
-    , m_color2(getRandColor())
-    , m_A(2, numPoints)
+    , m_color2(color)
+    , m_A(2, m_numPoints)
 {
 
     m_cartesianPlane.setCenter(0, 0);
     m_cartesianPlane.setSize(target.getSize().x, (-1.0) * target.getSize().y);
     m_centerCoordinate = target.mapPixelToCoords(mouseClickPosition, m_cartesianPlane);
 
-    double const dTheta = 2 * M_PI / (numPoints - 1);
+    double const dTheta = 2 * M_PI / (m_numPoints - 1);
     double theta = getRandDouble(0, 1) * M_PI / 2;
 
-    for (int j = 0; j < numPoints; j++) {
+    for (int j = 0; j < m_numPoints; j++) {
         double r = (j % 2) ? 20.f : 40.f;
         double dx = r * std::cos(theta);
         double dy = r * std::sin(theta);
@@ -58,6 +58,7 @@ void Particle::update(RenderTarget& target, float dt)
         sf::Vector2f worldPos(m_A(0, j - 1), m_A(1, j - 1));
         sf::Vector2i screenPos = target.mapCoordsToPixel(worldPos, m_cartesianPlane);
         m_shape[j].position = static_cast<sf::Vector2f>(screenPos);
+        m_shape[j].color = m_color2;
     }
 }
 
