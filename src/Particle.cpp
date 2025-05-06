@@ -35,9 +35,9 @@ void Particle::draw(RenderTarget &target, RenderStates states) const {
 
   lines[0].position = center;
   lines[0].color = m_color1;
-  for (int j = 1; j < m_numPoints; j++) {
+  for (int j = 1; j <= m_numPoints; j++) {
     lines[j].position = sf::Vector2f(target.mapCoordsToPixel(
-        sf::Vector2f(m_A(j - 1, 0), m_A(j - 1, 0)), m_cartesianPlane));
+        sf::Vector2f(m_A(0, j - 1), m_A(1, j - 1)), m_cartesianPlane));
     lines[j].color = m_color2;
   }
 
@@ -107,7 +107,7 @@ void Particle::unitTests() {
     std::cout << "Failed." << std::endl;
   }
 
-  std::cout << "Testing ScalingMatrix constructor..."<< std::flush;
+  std::cout << "Testing ScalingMatrix constructor..." << std::flush;
   ScalingMatrix s(1.5);
   if (s.getRows() == 2 && s.getCols() == 2 && almostEqual(s(0, 0), 1.5) &&
       almostEqual(s(0, 1), 0) && almostEqual(s(1, 0), 0) &&
