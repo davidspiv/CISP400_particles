@@ -46,8 +46,8 @@ inline std::vector<sf::Color> get_rainbow_colors(
         throw std::domain_error("sample count must be >= 2 for correct interpolation.");
     }
 
-    float const LIGHTNESS = 70.f;
-    float const CHROMA = 60.f;
+    float const LIGHTNESS = .4f;
+    float const CHROMA = 2.f;
     float const sample_degrees = (360.0f * rainbow_percent) / 100.0f;
 
     auto [l, c, start_hue] = clrspc::Rgb(start_color.r, start_color.g, start_color.b)
@@ -69,8 +69,7 @@ inline std::vector<sf::Color> get_rainbow_colors(
 
         auto const [r, g, b] = lch_ab.to_lab().to_rgb().get_values();
 
-        colors.push_back(
-            sf::Color(static_cast<uint8_t>(r), static_cast<uint8_t>(g), static_cast<uint8_t>(b)));
+        colors.push_back({ r, g, b });
     }
 
     return colors;
