@@ -9,13 +9,15 @@ public:
 
 private:
     sf::RenderWindow m_window;
-    std::vector<Particle> m_particles;
-    size_t m_currColorIdx;
 
+    float m_particleAccumulator;
+    std::vector<Particle> m_particles;
+
+    size_t m_currColorIdx;
     std::vector<sf::Color> m_colors;
 
     // Private functions for internal use only
-    void input();
+    void input(float dtAsSeconds);
     void update(float dtAsSeconds);
     void draw();
 };

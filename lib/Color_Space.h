@@ -115,14 +115,14 @@ inline Ok_Lch_Ab Ok_Lab::to_ok_lch_ab() const
 {
     auto [l, c, h] = cartesian_to_polar(m_values);
 
-    return Ok_Lch_Ab(l * 0.1f, c * 0.1f, h);
+    return Ok_Lch_Ab(l, c, h);
 }
 
 inline Rgb Ok_Lab::to_rgb() const
 
 {
     auto normal_gamma = [](float c) {
-        c = std::fmax(0.f, c); 
+        c = std::fmax(0.f, c);
         float encoded = (c <= 0.0031308f) ? 12.92f * c
                                           : 1.055f * std::exp2f(std::log2f(c) * 0.41666f) - 0.055f;
         return encoded * 255.f;

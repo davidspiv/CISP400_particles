@@ -27,8 +27,8 @@ protected:
     std::vector<std::vector<float>> m_values;
 
 private:
-    int m_rows;
-    int m_cols;
+    size_t m_rows;
+    size_t m_cols;
 };
 
 Matrix operator+(Matrix const& a, Matrix const& b);

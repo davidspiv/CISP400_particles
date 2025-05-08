@@ -1,12 +1,15 @@
 #include "Engine.h"
 #include "Particle.h"
+#include "config.h"
 #include "util.h"
 
 #include <SFML/Graphics.hpp>
 
 Engine::Engine()
-    : m_currColorIdx(0)
-    , m_colors(get_rainbow_colors(128))
+    : m_particleAccumulator(0.f)
+    , m_currColorIdx(0)
+    , m_colors(get_rainbow_colors(SECONDS_PER_RAINBOW_CYCLE * TARGET_FPS))
+
 {
     m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 
@@ -21,7 +24,7 @@ Engine::Engine()
     m_window.setFramerateLimit(TARGET_FPS);
 }
 
-void Engine::input()
+void Engine::input(float dtAsSeconds)
 {
     Event event;
 
@@ -41,11 +44,17 @@ void Engine::input()
     }
 
     sf::Vector2i const mousePos = sf::Mouse::getPosition(m_window);
-    bool const mouseLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-
+    bool mouseLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
     if (mouseLeftPressed) {
-        m_particles.emplace_back(Particle(m_window, m_colors[m_currColorIdx], mousePos));
-        m_currColorIdx = (m_currColorIdx + 1) % m_colors.size(); // wraps
+        m_particleAccumulator += PARTICLES_PER_SECOND * dtAsSeconds;
+
+        while (m_particleAccumulator >= 1.f) {
+            m_particles.emplace_back(Particle(m_window, m_colors[m_currColorIdx], mousePos));
+            m_currColorIdx = (m_currColorIdx + 1) % m_colors.size();
+            m_particleAccumulator -= 1.f;
+        }
+    } else {
+        m_particleAccumulator = 0.f; // optional: reset if mouse not held
     }
 }
 
@@ -87,7 +96,7 @@ void Engine::run()
     while (m_window.isOpen()) {
         float const dtAsSeconds = frameClock.restart().asSeconds();
 
-        input();
+        input(dtAsSeconds);
         update(dtAsSeconds);
         draw();
     }

@@ -8,12 +8,11 @@ using namespace Matrices;
 using namespace sf;
 
 class Particle : public Drawable {
-private:
+public:
     static float constexpr G = 1000;  // Gravity
     static float constexpr TTL = 2.0; // Time To Live
     static float constexpr SCALE = 0.99;
 
-public:
     Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition);
     void update(RenderTarget& target, float dt);
     virtual void draw(RenderTarget& target, RenderStates states) const override;

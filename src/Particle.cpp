@@ -1,5 +1,6 @@
 #include "Particle.h"
 #include "Matrices.h"
+#include "config.h"
 #include "util.h"
 
 Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition)
@@ -40,6 +41,12 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
 
 void Particle::update(RenderTarget& target, float dt)
 {
+    auto decayToBlack = [](Color& color, int rate = 1) {
+        color.r = (color.r > rate) ? color.r - rate : 0;
+        color.g = (color.g > rate) ? color.g - rate : 0;
+        color.b = (color.b > rate) ? color.b - rate : 0;
+    };
+
     m_ttl -= dt;
     m_vy -= G * dt;
 
@@ -50,8 +57,12 @@ void Particle::update(RenderTarget& target, float dt)
     scale(SCALE);
     translate(dx, dy);
 
+    decayToBlack(m_color1);
+    decayToBlack(m_color2);
+
     m_shape[0].position
         = sf::Vector2f(target.mapCoordsToPixel(m_centerCoordinate, m_cartesianPlane));
+    m_shape[0].color = m_color1;
 
     for (int j = 1; j <= m_numPoints; j++) {
         sf::Vector2f worldPos(m_A(0, j - 1), m_A(1, j - 1));
