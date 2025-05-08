@@ -8,7 +8,7 @@
 Engine::Engine()
     : m_particleAccumulator(0.f)
     , m_currColorIdx(0)
-    , m_colors(get_rainbow_colors(SECONDS_PER_RAINBOW_CYCLE * TARGET_FPS))
+    , m_colors(get_rainbow_colors(TARGET_FPS))
 
 {
     m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
@@ -44,7 +44,8 @@ void Engine::input(float dtAsSeconds)
     }
 
     sf::Vector2i const mousePos = sf::Mouse::getPosition(m_window);
-    bool mouseLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+    bool const mouseLeftPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+
     if (mouseLeftPressed) {
         m_particleAccumulator += PARTICLES_PER_SECOND * dtAsSeconds;
 
@@ -54,7 +55,7 @@ void Engine::input(float dtAsSeconds)
             m_particleAccumulator -= 1.f;
         }
     } else {
-        m_particleAccumulator = 0.f; // optional: reset if mouse not held
+        m_particleAccumulator = 0.f; // reset if mouse not held
     }
 }
 
