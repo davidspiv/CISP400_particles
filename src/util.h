@@ -23,6 +23,11 @@ inline double getRandDouble(double min, double max)
     return distribution(generator);
 }
 
+inline sf::Uint8 to_u8(float x)
+{
+    return static_cast<sf::Uint8>(std::round(std::clamp(x, 0.f, 255.f)));
+}
+
 inline sf::Color getRandColor()
 {
     return sf::Color(getRandInt(0, 255), getRandInt(0, 255), getRandInt(0, 255));
@@ -46,14 +51,14 @@ inline std::vector<sf::Color> get_rainbow_colors(
         throw std::domain_error("sample count must be >= 2 for correct interpolation.");
     }
 
-    float const LIGHTNESS = .4f;
-    float const CHROMA = 2.f;
+    float const LIGHTNESS = .7f;
+    float const CHROMA = .18f;
     float const sample_degrees = (360.0f * rainbow_percent) / 100.0f;
 
-    auto [l, c, start_hue] = clrspc::Rgb(start_color.r, start_color.g, start_color.b)
-                                 .to_lab()
-                                 .to_lch_ab()
-                                 .get_values();
+    float start_hue = clrspc::Rgb(start_color.r, start_color.g, start_color.b)
+                          .to_ok_lab()
+                          .to_ok_lch_ab()
+                          .get_values()[2];
 
     start_hue -= 20.f; // offset to match perceived color
 
@@ -65,143 +70,12 @@ inline std::vector<sf::Color> get_rainbow_colors(
         float const hue
             = clrspc::normalize_degrees(start_hue + (sample_degrees * i) / (sample_count - 1));
 
-        clrspc::Lch_Ab const lch_ab(LIGHTNESS, CHROMA, hue);
+        clrspc::Ok_Lch_Ab const ok_lch_ab(LIGHTNESS, CHROMA, hue);
 
-        auto const [r, g, b] = lch_ab.to_lab().to_rgb().get_values();
+        auto const [r, g, b] = ok_lch_ab.to_ok_lab().to_rgb().get_values();
 
-        colors.push_back({ r, g, b });
+        colors.push_back({ to_u8(r), to_u8(g), to_u8(b) });
     }
 
     return colors;
 }
-
-std::vector<sf::Color> const RAINBOW_GRADIENT = {
-    { 255, 124, 136 },
-    { 255, 125, 131 },
-    { 255, 126, 127 },
-    { 255, 127, 122 },
-    { 255, 129, 117 },
-    { 255, 130, 112 },
-    { 255, 132, 108 },
-    { 255, 134, 103 },
-    { 255, 135, 99 },
-    { 255, 137, 95 },
-    { 255, 139, 91 },
-    { 252, 141, 87 },
-    { 249, 143, 83 },
-    { 246, 145, 80 },
-    { 243, 147, 76 },
-    { 240, 149, 73 },
-    { 236, 151, 70 },
-    { 233, 153, 67 },
-    { 229, 155, 64 },
-    { 225, 157, 62 },
-    { 221, 159, 60 },
-    { 217, 161, 58 },
-    { 212, 163, 56 },
-    { 208, 165, 55 },
-    { 203, 167, 54 },
-    { 199, 168, 54 },
-    { 194, 170, 54 },
-    { 189, 172, 54 },
-    { 184, 173, 55 },
-    { 179, 175, 56 },
-    { 174, 176, 57 },
-    { 169, 178, 59 },
-    { 164, 179, 61 },
-    { 158, 180, 63 },
-    { 153, 182, 66 },
-    { 147, 183, 69 },
-    { 141, 184, 72 },
-    { 135, 185, 76 },
-    { 129, 186, 79 },
-    { 123, 187, 83 },
-    { 116, 188, 87 },
-    { 109, 189, 91 },
-    { 102, 190, 96 },
-    { 94, 191, 100 },
-    { 86, 192, 105 },
-    { 77, 192, 109 },
-    { 67, 193, 114 },
-    { 55, 194, 119 },
-    { 39, 194, 124 },
-    { 12, 195, 129 },
-    { 0, 195, 134 },
-    { 0, 195, 140 },
-    { 0, 196, 145 },
-    { 0, 196, 150 },
-    { 0, 197, 156 },
-    { 0, 197, 161 },
-    { 0, 197, 166 },
-    { 0, 197, 172 },
-    { 0, 197, 177 },
-    { 0, 197, 183 },
-    { 0, 197, 188 },
-    { 0, 197, 193 },
-    { 0, 197, 198 },
-    { 0, 197, 204 },
-    { 0, 197, 209 },
-    { 0, 197, 214 },
-    { 0, 197, 219 },
-    { 0, 196, 223 },
-    { 0, 196, 228 },
-    { 0, 196, 233 },
-    { 0, 195, 237 },
-    { 0, 195, 241 },
-    { 0, 194, 245 },
-    { 0, 194, 249 },
-    { 0, 193, 253 },
-    { 0, 192, 255 },
-    { 0, 191, 255 },
-    { 0, 191, 255 },
-    { 0, 190, 255 },
-    { 0, 189, 255 },
-    { 0, 188, 255 },
-    { 0, 187, 255 },
-    { 0, 185, 255 },
-    { 0, 184, 255 },
-    { 0, 183, 255 },
-    { 0, 181, 255 },
-    { 0, 180, 255 },
-    { 0, 178, 255 },
-    { 25, 177, 255 },
-    { 56, 175, 255 },
-    { 76, 174, 255 },
-    { 91, 172, 255 },
-    { 105, 170, 255 },
-    { 117, 168, 255 },
-    { 128, 166, 255 },
-    { 138, 164, 255 },
-    { 148, 162, 255 },
-    { 157, 160, 255 },
-    { 165, 158, 255 },
-    { 174, 156, 255 },
-    { 181, 154, 255 },
-    { 189, 151, 255 },
-    { 196, 149, 255 },
-    { 202, 147, 252 },
-    { 208, 145, 248 },
-    { 214, 143, 245 },
-    { 220, 141, 241 },
-    { 225, 139, 236 },
-    { 230, 137, 232 },
-    { 235, 135, 228 },
-    { 240, 133, 223 },
-    { 244, 131, 218 },
-    { 248, 129, 213 },
-    { 251, 128, 209 },
-    { 254, 126, 204 },
-    { 255, 125, 199 },
-    { 255, 124, 193 },
-    { 255, 123, 188 },
-    { 255, 122, 183 },
-    { 255, 122, 178 },
-    { 255, 121, 173 },
-    { 255, 121, 167 },
-    { 255, 121, 162 },
-    { 255, 121, 157 },
-    { 255, 122, 152 },
-    { 255, 122, 147 },
-    { 255, 123, 141 },
-    { 255, 124, 136 },
-};

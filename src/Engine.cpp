@@ -6,8 +6,7 @@
 
 Engine::Engine()
     : m_currColorIdx(0)
-    , m_colors(RAINBOW_GRADIENT)
-// , m_colors(get_rainbow_colors(128))
+    , m_colors(get_rainbow_colors(128))
 {
     m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 

@@ -12,18 +12,18 @@
 namespace clrspc {
 
 // forward declarations
-class Lch_Ab;
-class Lab;
+class Ok_Lch_Ab;
+class Ok_Lab;
 class Rgb;
 
-template<typename channel_t> class Color {
+class Color {
 protected:
-    std::array<channel_t, 3> m_values;
+    std::array<float, 3> m_values;
 
 public:
-    Color(channel_t x, channel_t y, channel_t z) { m_values = { x, y, z }; }
+    Color(float x, float y, float z) { m_values = { x, y, z }; }
 
-    [[nodiscard]] std::array<channel_t, 3> get_values() const { return m_values; }
+    [[nodiscard]] std::array<float, 3> get_values() const { return m_values; }
 
     virtual void print() const
     {
@@ -43,30 +43,30 @@ public:
     [[nodiscard]] bool operator!=(Color const& other) const { return !(*this == other); }
 };
 
-class Lab : public Color<float> {
+class Ok_Lab : public Color {
 public:
-    Lab(float l, float a, float b);
+    Ok_Lab(float l, float a, float b);
 
     float l() const { return m_values[0]; }
     float a() const { return m_values[1]; }
     float b() const { return m_values[2]; }
 
-    [[nodiscard]] Lch_Ab to_lch_ab() const;
+    [[nodiscard]] Ok_Lch_Ab to_ok_lch_ab() const;
     [[nodiscard]] Rgb to_rgb() const;
 
     void print() const override;
 };
 
-class Lch_Ab : public Color<float> {
+class Ok_Lch_Ab : public Color {
 public:
-    Lch_Ab(float l, float c, float h);
+    Ok_Lch_Ab(float l, float c, float h);
 
-    [[nodiscard]] Lab to_lab() const;
+    [[nodiscard]] Ok_Lab to_ok_lab() const;
 
     void print() const override;
 };
 
-class Rgb : public Color<uint8_t> {
+class Rgb : public Color {
 public:
     Rgb(float r, float g, float b);
 
@@ -74,7 +74,7 @@ public:
     float g() const { return m_values[1]; }
     float b() const { return m_values[2]; }
 
-    [[nodiscard]] Lab to_lab() const;
+    [[nodiscard]] Ok_Lab to_ok_lab() const;
 
     void print() const override;
 };
@@ -83,7 +83,7 @@ public:
 
 inline float to_radians(float const degrees) { return degrees * (M_PI / 180.f); }
 
-inline float to_degrees(float const radians) { return radians * (180.0 / M_PI); }
+inline float to_degrees(float const radians) { return radians * (180.f / M_PI); }
 
 inline float remove_gamma(float c)
 {
@@ -103,11 +103,11 @@ inline float apply_gamma(float const c)
     return (c <= 0.0031308f) ? (c * 12.92f) : 1.055f * std::pow(c, 1.0f / 2.4f) - 0.055f;
 }
 
-inline double normalize_degrees(double x) { return x - std::floor(x / 360.0f) * 360.0f; }
+inline float normalize_degrees(float x) { return x - std::floor(x / 360.0f) * 360.0f; }
 
 inline std::array<float, 3> to_polar_color_space(std::array<float, 3> const& cartesian_color_space)
 {
-    auto const [l, a, b] = cartesian_color_space; // LchAb equivalents: a=u and b=v
+    auto const [l, a, b] = cartesian_color_space;
     float const c = std::sqrt(a * a + b * b);
     float const h_component = to_degrees(std::atan2(b, a));
     float const h = (h_component >= 0) ? h_component : h_component + 360.0;
@@ -126,21 +126,21 @@ inline std::array<float, 3> from_polar_color_space(std::array<float, 3> const& p
     return { l, a, b };
 }
 
-// =========== okLAB Space ==========
+// =========== okOK_LAB Space ==========
 
-inline Lab::Lab(float l, float a, float b)
+inline Ok_Lab::Ok_Lab(float l, float a, float b)
     : Color(l, a, b)
 {
 }
 
-inline Lch_Ab Lab::to_lch_ab() const
+inline Ok_Lch_Ab Ok_Lab::to_ok_lch_ab() const
 {
     auto const [l, c, h] = to_polar_color_space(m_values);
 
-    return Lch_Ab(l, c, h);
+    return Ok_Lch_Ab(l * 0.1f, c * 0.1f, h);
 }
 
-inline Rgb Lab::to_rgb() const
+inline Rgb Ok_Lab::to_rgb() const
 {
     auto [L, a, b] = m_values;
 
@@ -152,34 +152,34 @@ inline Rgb Lab::to_rgb() const
     float m = m_ * m_ * m_;
     float s = s_ * s_ * s_;
 
-    return {
-        +4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s,
-        -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s,
-        -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s,
-    };
+    float r1 = +4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s;
+    float g1 = -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s;
+    float b1 = -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s;
+
+    return { apply_gamma(r1) * 255.f, apply_gamma(g1) * 255.f, apply_gamma(b1) * 255.f };
 }
 
-inline void Lab::print() const
+inline void Ok_Lab::print() const
 {
-    std::cout << "[Lab]" << "\nL: " << m_values[0] << "\na: " << m_values[1]
+    std::cout << "[Ok_Lab]" << "\nL: " << m_values[0] << "\na: " << m_values[1]
               << "\nb: " << m_values[2] << "\n\n";
 }
 
 // =========== okLCH Space ==========
 
-inline Lch_Ab::Lch_Ab(float l, float c, float h)
+inline Ok_Lch_Ab::Ok_Lch_Ab(float l, float c, float h)
     : Color(l, c, h)
 {
 }
 
-inline Lab Lch_Ab::to_lab() const
+inline Ok_Lab Ok_Lch_Ab::to_ok_lab() const
 {
     auto const [l, a, b] = from_polar_color_space(m_values);
 
-    return Lab(l, a, b);
+    return Ok_Lab(l, a, b);
 }
 
-inline void Lch_Ab::print() const
+inline void Ok_Lch_Ab::print() const
 {
     std::cout << "[LCHab]" << "\nL: " << m_values[0] << "\nc: " << m_values[1]
               << "\nh: " << m_values[2] << "\n\n";
@@ -188,43 +188,35 @@ inline void Lch_Ab::print() const
 // ========== sRGB Space ==========
 
 inline Rgb::Rgb(float r, float g, float b)
-    : Color { static_cast<uint8_t>(std::clamp(std::lround(r), 0l, 255l)),
-        static_cast<uint8_t>(std::clamp(std::lround(g), 0l, 255l)),
-        static_cast<uint8_t>(std::clamp(std::lround(b), 0l, 255l)) }
+    : Color(r, g, b)
 {
-
-    auto warn_if_clamped = [](float val, char const* name) {
-        if (val < -0.001f || val > 255.001f) {
-            std::cout << "Warning: " << name << " channel clamped: " << val << '\n';
-        }
-    };
-
-    warn_if_clamped(r, "R");
-    warn_if_clamped(g, "G");
-    warn_if_clamped(b, "B");
 }
 
-inline Lab Rgb::to_lab() const
+inline Ok_Lab Rgb::to_ok_lab() const
 {
-    auto [r, g, b] = m_values;
+    float r_lin = remove_gamma(r() / 255.f);
+    float g_lin = remove_gamma(g() / 255.f);
+    float b_lin = remove_gamma(b() / 255.f);
 
-    float l = 0.4122214708f * r + 0.5363325363f * g + 0.0514459929f * b;
-    float m = 0.2119034982f * r + 0.6806995451f * g + 0.1073969566f * b;
-    float s = 0.0883024619f * r + 0.2817188376f * g + 0.6299787005f * b;
+    float l = 0.4122214708f * r_lin + 0.5363325363f * g_lin + 0.0514459929f * b_lin;
+    float m = 0.2119034982f * r_lin + 0.6806995451f * g_lin + 0.1073969566f * b_lin;
+    float s = 0.0883024619f * r_lin + 0.2817188376f * g_lin + 0.6299787005f * b_lin;
 
     float l_ = cbrtf(l);
     float m_ = cbrtf(m);
     float s_ = cbrtf(s);
 
-    return Lab(0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_,
+    return {
+        0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_,
         1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_,
-        0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_);
+        0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_,
+    };
 }
 
 inline void Rgb::print() const
 {
-    std::cout << "[Rgb]" << "\nr: " << m_values[0] << "\ng: " << m_values[1]
-              << "\nb: " << m_values[2] << std::endl;
+    std::cout << "[Rgb]" << "\nr: " << (int)m_values[0] << "\ng: " << (int)m_values[1]
+              << "\nb: " << (int)m_values[2] << std::endl;
 }
 
 } // namespace clrspc
