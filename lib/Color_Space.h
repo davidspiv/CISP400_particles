@@ -25,11 +25,7 @@ public:
 
     [[nodiscard]] std::array<float, 3> get_values() const { return m_values; }
 
-    virtual void print() const
-    {
-        std::cout << "[GEN]" << "\nC1: " << m_values[0] << "\nC2: " << m_values[1]
-                  << "\nC3: " << m_values[2] << "\n\n";
-    }
+    virtual void print() const = 0;
 
     [[nodiscard]] bool operator==(Color const& other) const
     {
@@ -85,43 +81,25 @@ inline float to_radians(float const degrees) { return degrees * (M_PI / 180.f); 
 
 inline float to_degrees(float const radians) { return radians * (180.f / M_PI); }
 
-inline float remove_gamma(float c)
-{
-    if (c <= 0) {
-        return c;
-    }
-
-    return (c <= 0.04045f) ? (c / 12.92f) : std::pow((c + 0.055f) / 1.055f, 2.4f);
-}
-
-inline float apply_gamma(float const c)
-{
-    if (c <= 0) {
-        return c;
-    }
-
-    return (c <= 0.0031308f) ? (c * 12.92f) : 1.055f * std::pow(c, 1.0f / 2.4f) - 0.055f;
-}
-
 inline float normalize_degrees(float x) { return x - std::floor(x / 360.0f) * 360.0f; }
 
-inline std::array<float, 3> to_polar_color_space(std::array<float, 3> const& cartesian_color_space)
+inline std::array<float, 3> cartesian_to_polar(std::array<float, 3> const& cartesian_color_space)
 {
-    auto const [l, a, b] = cartesian_color_space;
-    float const c = std::sqrt(a * a + b * b);
-    float const h_component = to_degrees(std::atan2(b, a));
-    float const h = (h_component >= 0) ? h_component : h_component + 360.0;
+    auto [l, a, b] = cartesian_color_space;
+    float c = std::sqrt(a * a + b * b);
+    float h_component = to_degrees(std::atan2(b, a));
+    float h = (h_component >= 0) ? h_component : h_component + 360.0;
 
     return { l, c, h };
 }
 
-inline std::array<float, 3> from_polar_color_space(std::array<float, 3> const& polar_color_space)
+inline std::array<float, 3> polar_to_cartesian(std::array<float, 3> const& polar_color_space)
 {
     auto [l, c, h_deg] = polar_color_space;
-    float const h_rad = to_radians(h_deg);
+    float h_rad = to_radians(h_deg);
 
-    float const a = c * std::cos(h_rad);
-    float const b = c * std::sin(h_rad);
+    float a = c * std::cos(h_rad);
+    float b = c * std::sin(h_rad);
 
     return { l, a, b };
 }
@@ -135,13 +113,21 @@ inline Ok_Lab::Ok_Lab(float l, float a, float b)
 
 inline Ok_Lch_Ab Ok_Lab::to_ok_lch_ab() const
 {
-    auto const [l, c, h] = to_polar_color_space(m_values);
+    auto [l, c, h] = cartesian_to_polar(m_values);
 
     return Ok_Lch_Ab(l * 0.1f, c * 0.1f, h);
 }
 
 inline Rgb Ok_Lab::to_rgb() const
+
 {
+    auto normal_gamma = [](float c) {
+        c = std::fmax(0.f, c); 
+        float encoded = (c <= 0.0031308f) ? 12.92f * c
+                                          : 1.055f * std::exp2f(std::log2f(c) * 0.41666f) - 0.055f;
+        return encoded * 255.f;
+    };
+
     auto [L, a, b] = m_values;
 
     float l_ = L + 0.3963377774f * a + 0.2158037573f * b;
@@ -156,7 +142,7 @@ inline Rgb Ok_Lab::to_rgb() const
     float g1 = -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s;
     float b1 = -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s;
 
-    return { apply_gamma(r1) * 255.f, apply_gamma(g1) * 255.f, apply_gamma(b1) * 255.f };
+    return { normal_gamma(r1), normal_gamma(g1), normal_gamma(b1) };
 }
 
 inline void Ok_Lab::print() const
@@ -174,7 +160,7 @@ inline Ok_Lch_Ab::Ok_Lch_Ab(float l, float c, float h)
 
 inline Ok_Lab Ok_Lch_Ab::to_ok_lab() const
 {
-    auto const [l, a, b] = from_polar_color_space(m_values);
+    auto [l, a, b] = polar_to_cartesian(m_values);
 
     return Ok_Lab(l, a, b);
 }
@@ -194,9 +180,14 @@ inline Rgb::Rgb(float r, float g, float b)
 
 inline Ok_Lab Rgb::to_ok_lab() const
 {
-    float r_lin = remove_gamma(r() / 255.f);
-    float g_lin = remove_gamma(g() / 255.f);
-    float b_lin = remove_gamma(b() / 255.f);
+    auto normal_linear = [](float c) {
+        c = std::fmax(0.f, c / 255.f); // normalize and avoid negatives
+        return (c <= 0.04045f) ? c / 12.92f : std::exp2f(std::log2f((c + 0.055f) / 1.055f) * 2.4f);
+    };
+
+    float r_lin = normal_linear(r());
+    float g_lin = normal_linear(g());
+    float b_lin = normal_linear(b());
 
     float l = 0.4122214708f * r_lin + 0.5363325363f * g_lin + 0.0514459929f * b_lin;
     float m = 0.2119034982f * r_lin + 0.6806995451f * g_lin + 0.1073969566f * b_lin;
