@@ -8,7 +8,7 @@
 Engine::Engine()
     : m_particleAccumulator(0.f)
     , m_currColorIdx(0)
-    , m_colors(get_rainbow_colors(TARGET_FPS))
+    , m_colors(get_rainbow_colors(PARTICLES_PER_SECOND * SECONDS_PER_RAINBOW_CYCLE))
 
 {
     m_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);

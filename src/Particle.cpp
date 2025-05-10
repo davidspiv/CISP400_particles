@@ -21,8 +21,11 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
     double const dTheta = 2 * M_PI / (m_numPoints - 1);
     double theta = getRandDouble(0, 1) * M_PI / 2;
 
+    double outerRadius = getRandInt(30, 40);
+    double innerRadius = getRandInt(20, 30);
+
     for (int j = 0; j < m_numPoints; j++) {
-        double r = (j % 2) ? 20.f : 40.f;
+        double r = (j % 2) ? innerRadius : outerRadius;
         double dx = r * std::cos(theta);
         double dy = r * std::sin(theta);
 
@@ -41,7 +44,7 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
 
 void Particle::update(RenderTarget& target, float dt)
 {
-    auto decayToBlack = [](Color& color, int rate = 1) {
+    auto decayToBlack = [](Color& color, int rate = 2) {
         color.r = (color.r > rate) ? color.r - rate : 0;
         color.g = (color.g > rate) ? color.g - rate : 0;
         color.b = (color.b > rate) ? color.b - rate : 0;
