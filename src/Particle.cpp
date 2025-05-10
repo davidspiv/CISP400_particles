@@ -4,8 +4,7 @@
 #include "util.h"
 
 Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition)
-    : m_ttl(TTL)
-    , m_numPoints(getRandOddInt(10, 33))
+    : m_numPoints(getRandOddInt(10, 33))
     , m_radiansPerSec(getRandInt(0, 1) * M_PI)
     , m_vx(getRandInt(-500, 500))
     , m_vy(getRandInt(100, 500))
@@ -21,8 +20,22 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
     double const dTheta = 2 * M_PI / (m_numPoints - 1);
     double theta = getRandDouble(0, 1) * M_PI / 2;
 
-    double outerRadius = getRandInt(30, 40);
-    double innerRadius = getRandInt(20, 30);
+    double speed = std::sqrt(m_vx * m_vx + m_vy * m_vy);
+
+    // Define your expected maximum speed (tune as needed)
+    double const maxSpeed = std::sqrt(500 * 500 + 500 * 500);
+
+    // Clamp speed to [0, maxSpeed]
+    speed = std::min(speed, maxSpeed);
+
+    // Normalize: map speed from [0, maxSpeed] to [0.5, 0]
+    double sizeFactor = 0.5 * (1.0 - (speed / maxSpeed));
+
+    m_ttl = TTL * sizeFactor * 2;
+
+    double baseRadius = getRandDouble(40, 50); // Some base size
+    double outerRadius = baseRadius * sizeFactor;
+    double innerRadius = outerRadius - 5.0; // Or some fixed thickness
 
     for (int j = 0; j < m_numPoints; j++) {
         double r = (j % 2) ? innerRadius : outerRadius;
