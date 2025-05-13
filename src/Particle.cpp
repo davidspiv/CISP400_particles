@@ -4,7 +4,8 @@
 #include "util.h"
 
 Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPosition)
-    : m_numPoints(getRandOddInt(10, 33))
+    : m_ttl(TTL)
+    , m_numPoints(getRandOddInt(10, 33))
     , m_radiansPerSec(getRandInt(0, 1) * M_PI)
     , m_vx(getRandInt(-500, 500))
     , m_vy(getRandInt(100, 500))
@@ -31,11 +32,11 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
     // Normalize: map speed from [0, maxSpeed] to [0.5, 0]
     double sizeFactor = 0.5 * (1.0 - (speed / maxSpeed));
 
-    m_ttl = TTL * sizeFactor * 2;
+    // m_ttl = TTL * sizeFactor * 2;
 
     double baseRadius = getRandDouble(40, 50); // Some base size
-    double outerRadius = baseRadius * sizeFactor;
-    double innerRadius = outerRadius - 5.0; // Or some fixed thickness
+    double outerRadius = baseRadius;
+    double innerRadius = baseRadius * .6f; // Or some fixed thickness
 
     for (int j = 0; j < m_numPoints; j++) {
         double r = (j % 2) ? innerRadius : outerRadius;
