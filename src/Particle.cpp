@@ -14,9 +14,7 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
     , m_A(2, m_numPoints)
 {
 
-    m_cartesianPlane.setCenter(0, 0);
-    m_cartesianPlane.setSize(target.getSize().x, (-1.0) * target.getSize().y);
-    m_centerCoordinate = target.mapPixelToCoords(mouseClickPosition, m_cartesianPlane);
+    m_centerCoordinate = static_cast<Vector2f>(mouseClickPosition);
 
     double const dTheta = 2 * M_PI / (m_numPoints - 1);
     double theta = getRandDouble(0, 1) * M_PI / 2;
@@ -67,8 +65,8 @@ void Particle::update(RenderTarget& target, float dt)
     m_ttl -= dt;
     m_vy -= G * dt;
 
-    float const dx = m_vx * dt;
-    float const dy = m_vy * dt;
+    float const dx = -m_vx * dt;
+    float const dy = -m_vy * dt;
 
     rotate(dt * m_radiansPerSec);
     scale(SCALE);
@@ -77,14 +75,12 @@ void Particle::update(RenderTarget& target, float dt)
     decayToBlack(m_color1);
     decayToBlack(m_color2);
 
-    m_shape[0].position
-        = sf::Vector2f(target.mapCoordsToPixel(m_centerCoordinate, m_cartesianPlane));
+    m_shape[0].position = m_centerCoordinate;
     m_shape[0].color = m_color1;
 
     for (int j = 1; j <= m_numPoints; j++) {
         sf::Vector2f worldPos(m_A(0, j - 1), m_A(1, j - 1));
-        sf::Vector2i screenPos = target.mapCoordsToPixel(worldPos, m_cartesianPlane);
-        m_shape[j].position = static_cast<sf::Vector2f>(screenPos);
+        m_shape[j].position = { worldPos };
         m_shape[j].color = m_color2;
     }
 }

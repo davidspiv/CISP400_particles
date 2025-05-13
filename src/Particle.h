@@ -29,7 +29,6 @@ private:
     float m_radiansPerSec;
     float m_vx;
     float m_vy;
-    View m_cartesianPlane;
     Color m_color1;
     Color m_color2;
     Matrix m_A;
