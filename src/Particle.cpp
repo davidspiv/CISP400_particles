@@ -27,11 +27,6 @@ Particle::Particle(RenderTarget& target, sf::Color color, Vector2i mouseClickPos
     // Clamp speed to [0, maxSpeed]
     speed = std::min(speed, maxSpeed);
 
-    // Normalize: map speed from [0, maxSpeed] to [0.5, 0]
-    double sizeFactor = 0.5 * (1.0 - (speed / maxSpeed));
-
-    // m_ttl = TTL * sizeFactor * 2;
-
     double baseRadius = getRandDouble(40, 50); // Some base size
     double outerRadius = baseRadius;
     double innerRadius = baseRadius * .6f; // Or some fixed thickness
